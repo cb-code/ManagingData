@@ -1,0 +1,66 @@
+APAN 5400 || Assignment 3 - JSON
+C. Blanchard || Uni: chb2132
+
+Assignment 3: Details
+
+Imagine that using the API provided by a service like Yelp (let's call it YelpYou) you have extracted information about Sichuan Dragon, which has three branches (restaurants) in New York City. The YelpYou API will return the information in the form of a JSON object. Your assignment is to write the JSON object that YelpYou API might possibly return. Imagine that this JSON object (and JSON objects for other restaurants in NYC) is consumed by a program that strips the information from the JSON objects and feeds it to an analytical pipeline.
+
+The information given is that Sichuan Dragon cuisine is Chinese, region Sichuan. Its cost level is '$$', decor is casual, noise level is average, it doesn't have Wi-Fi, it takes Visa, MasterCard, and Discover credit cards. For each branch of Sichuan Dragon, it gives the address of each of branch, its phone number, its web-site URL, and its customer rating. It also includes for each restaurant the first sentence of three reviews with a link to 'more' of the review. For example, "Loved their pot stickers" followed by a link to the rest of the review. (Please make up this information.) You must structure your information such that information about each branch is in a JSON object, embedded in the JSON object for Sichuan Dragon.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+JSON Code: Sichuan Dragon Object
+
+{
+  "Sichuan Dragon" : [
+    {
+      "cuisine" : "Chinese",
+      "region" : "Sichuan",
+      "cost level" : "$$",
+      "decor" : "casual",
+      "noise level" : "average",
+      "Wi-Fi" : "no",
+      "credit cards accepted" : ["Visa", "MasterCard", "Discover"],
+      "branches" : [
+        {
+          "address": "2001 Broadway Avenue, New York NY 10025",
+          "phone" : "212-212-1212", 
+          "website URL" : "sichuandragon_broadway.net", 
+          "customer rating" : "4.8",
+          "reviews" : [
+            {
+            "review_1" : "yummy yummy in my tummy",
+            "review_2" : "was wayyyy too spicy!!",
+            "review_3" : "best dinner i have EVER had! five stars 4sho"
+            }
+          ]
+        },
+        {
+          "address": "989 Bowery Avenue, New York NY 10001", 
+          "phone" : "212-555-5555", 
+          "website URL" : "sichuandragon_bowery.net",
+          "customer rating" : "4.9",
+          "reviews" : [
+            {
+              "review_1" : "my GO-TO place for lunch every week day!!!", 
+              "review_2" : "Good deal for the size/portion of the meal.", 
+              "review_3" : "waitress was somewhat distracted and sloppy"
+            }
+          ]
+        },
+        {
+          "address": "555 Park Place, New York NY 10013", 
+          "phone" : "212-123-1234", 
+          "website URL" : "sichuandragon_parkplace.net",
+          "customer rating" : "4.3",
+          "reviews" : [
+            {
+              "review_1" : "the noodles were somewhat dry, and bland.", 
+              "review_2" : "I usually come here during lunch break--s'ok", 
+              "review_3" : "NOT EVER COMING BACK HERE AGAIN! TERRIBLE!!!"
+            }
+          ]
+        }
+    }
+  ]
+}
