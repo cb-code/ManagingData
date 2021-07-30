@@ -1,0 +1,101 @@
+5400 Managing Data | Assignment 6
+chb2132 | C. Blanchard | 11/21/20 11/21/2020
+
+We have a set of 5 documents containing HTML links to some other documents.
+
+Thus, you may have a document, Doc1, which contains the word ‘manufacturer’ which is a hyperlink, www.apple.com, to the landing page of Apple, Inc. (the company) landing page.
+
+In this case we regard Doc1 as the source, the word ‘manufacturer’ as the anchor in Doc1, and the landing page (which we will call Apple Landing Page) as the target.
+
+So, we can represent this information as <Apple Landing Page >.
+
+The general format for representing this information is <target >.
+Of course, Doc1 may contain another hyperlink to Apple Landing page on the anchor ‘Apple’.
+
+In this case, we can represent the information about these two links in Doc1 as <Apple Landing Page <Doc1: manufacturer, Doc1: Apple».
+
+And if we had a second document Doc2 which contains a hyperlink to Apple Landing Page on the anchor ‘Apple’, we can represent this information as <Apple Landing Page <Doc1: manufacturer, Doc1: Apple, Doc2:Apple».
+
+Thus, the format for representing this information is: <target >
+
+Suppose you are given 5 documents which may contain hyperlinks to some targets. The MapReduce algorithm is used to compile a list of <target >.
+
+Suppose you have 5 processing nodes (n1, n2, n3, n4, n5) on which to execute MapReduce for this task. The nodes n1, n2, n3 are used for Map and nodes n4, n5 are used for Reduce.
+
+Node n1 processes Doc1 and Doc2; node n2 processes Doc3 and Doc4, node n3 processes Doc5.
+You decide what should be assigned to nodes n4 and n5 (during the intermediate stage between the Map stage and the Reduce stage).
+
+Show the following:
+############################################################################
+a.) Information stored on nodes n1, n2, n3 after Map has been executed
+############################################################################
+----------------------------------------------------------------------------
+Node 1 (n1) -> Processses Doc1 and Doc2
+----------------------------------------------------------------------------
+
+<Columbia University Landing Page <Doc1: Columbia University, Doc1: Columbia, Doc2: Ivy League school>>
+<SPS Landing Page <Doc1: SPS>>
+<NYU Landing Page <Doc1: NYU>>
+<Apple Landing Page <Doc2: Apple>>
+----------------------------------------------------------------------------
+Node 2 (n2) -> Processes Doc3 and Doc4
+----------------------------------------------------------------------------
+<Columbia University Landing Page <Doc3: the university>>
+<Applied Analytics Program page <Doc3: APAN>>
+<NYU Landing Page <Doc4: the university>>
+----------------------------------------------------------------------------
+Node 3 (n3) -> Processes Doc5
+----------------------------------------------------------------------------
+<Apple Landing Page <Doc5: iOS>>
+<Microsoft Landing page <Doc5: windows>>
+############################################################################
+b.) Information stored on nodes n4 and n5 after Reduce has been executed
+############################################################################
+----------------------------------------------------------------------------
+Node 1 (n1)
+----------------------------------------------------------------------------
+<Applied Analytics Program page <Doc3: APAN>>
+<Apple Landing Page <Doc2: Apple, Doc5: iOS>>
+----------------------------------------------------------------------------
+Node 2 (n2)
+----------------------------------------------------------------------------
+<Columbia University Landing Page <Doc1: Columbia University, Doc1: Columbia, Doc2: Ivy League school, D
+----------------------------------------------------------------------------
+Node 3 (n3)
+----------------------------------------------------------------------------
+<Microsoft Landing page <Doc5: windows>>
+----------------------------------------------------------------------------
+Node 4 (n4) -> *Intermediary Assignment [Between Map and Reduce Stages] TBD*
+----------------------------------------------------------------------------
+<NYU Landing Page <Doc1: NYU, Doc4: the university>>
+----------------------------------------------------------------------------
+Node 5 (n5) -> *Intermediary Assignment [Between Map and Reduce Stages] TBD*
+----------------------------------------------------------------------------
+<SPS Landing Page <Doc1: SPS>>
+
+############################################################################
+c.) The final output
+############################################################################
+<Apple Landing Page <Doc2: Apple, Doc5: iOS>>
+<Applied Analytics Program page <Doc3: APAN>>
+<Columbia University Landing Page <Doc1: Columbia University, Doc1: Columbia, Doc2: Ivy League school, D
+<Microsoft Landing page <Doc5: windows>>
+<NYU Landing Page <Doc1: NYU, Doc4: the university>>
+<SPS Landing Page <Doc1: SPS>>
+############################################################################
+d.) Diagram of what information is sent to which node from which node
+############################################################################
+**Please see following page for node-information-flow diagram**
+Additional details:
+-Clearly label each node and the information it contains -The 5 docs contain these links and only these links as anchors
+Doc1 contains:
+-Anchor ‘Columbia University’ -> points to Columbia University Landing Page -Anchor ‘SPS’ -> points to the SPS Landing Page -Anchor ‘NYU’ -> points to NYU Landing Page -Anchor ‘Columbia’ -> points to Columbia University Landing Page
+Doc2 contains:
+-Anchor ‘Ivy League school’ -> points to Columbia University Landing Page -Anchor ‘Apple’ -> points to Apple Landing Page
+Doc3 (the ‘SPS Landing Page’ ???) contains:
+-Anchor ‘the university’ -> points to Columbia University Landing Page -Anchor ‘APAN’ -> points to the Applied Analytics Program page
+Doc4 contains:
+-Anchor ‘the university’ -> points to NYU Landing Page
+Doc 5 contains:
+-Anchor ‘iOS’ -> points to Apple Landing Page -Anchor ‘windows’ -> points to Microsoft Landing page
+======================================================================
