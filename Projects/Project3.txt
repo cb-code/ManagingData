@@ -1,0 +1,236 @@
+--------------------------------------------------------------------------------
+					Project 3 | Hadoop Application
+					 Fall 20 | 5400 Managing Data 
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+					UNI: chb2132 | Name: C. Blanchard
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+NOTES| Objectives
+--------------------------------------------------------------------------------
+
+	1| Design toy applications using Sqoop, Flume, or Storm
+
+	2| Create a small Hadoop application
+
+--------------------------------------------------------------------------------
+NOTES| Additional Details
+--------------------------------------------------------------------------------
+
+	ZoomZoomCom| Marketing company, hired you to design data analysis project
+
+	Hadoop| Project that will determine, for each of thousands of product 
+			categories, if there exists a correlation between the sentiment of 
+			the context in which a link to a page for a product of a certain
+			category appears and the likelihood of its being clicked on.
+
+	Example| Is an upbeat context of a link to a cosmetic product more likely to
+	be clicked on than a downbeat one? Is the opposite true for dieting products?
+
+	Additional| You are provided a database containing the URL for a large no. of
+	product pages and the category of each product. You may assume there is only
+	one product in each product page. Let us call it the "URL Database".
+
+	Assume you have access to a web crawler that crawls web pages, and a web
+	scraping program that can find out whether a web page has a link to one of 
+	the product pages and for each such link, it can extract the paragraph (or 
+	a roughly 50 words window around the occurrence of the link--dwai!)
+
+	You have access to a log file which shows for each such page how many times
+	it was served in a given week and how many times any link that points to
+	one of our product pages was clicked on during that week. Based on the data
+	in the log file, you can compute the hit ratio of each link achor (the 
+	number of times the link anchor was clicked on, divided by the number of 
+	times the page was viewed.)
+
+	You also have a sentiment analysis program called Sentimeter for 
+	determining whether a paragraph is Upbeat, Downbeat, or Neutral.
+
+	Based on the hit ratio of a link anchor + the senitment of the context in
+	which each link anchor appears you maybe come up with something like this:
+	-For link anchor 'XYZ' the hit ratio when the context was upbeat was 30%,
+	the hit ratio when the link was downbeat was 2%, and neutral was 7%.
+
+	You need to group the link anchors by the product categories that they
+	point to. Ex. different occurrences of "truly wonderful device" may lead
+	to different products.
+
+	Then you will have to aggregate these hit ratios by product categories.
+	For cosmetics, say we found a hundred link anchors and we have the hit
+	ratios for each of our 3 sentiment categories, we can then just avg.
+	them out--similarly for other product categories to get the correlations
+	that we seek.
+
+--------------------------------------------------------------------------------
+First, the URL DB has to be imported into Hadoop.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Q1|a 
+Which component of Hadoop should your system use to ingest the URL DB into 
+Hadoop?
+
+A1|a
+I would use the Hadoop component that serves as a data ingestion tool, such as
+Sqoop, in order to ingest the URL DB into Hadoop.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Q1|b
+Which component should your system use to interact with the URL DB?
+
+A1|b
+The component that the system should utilize in order to interact with the URL
+DB is Hive.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Q1|c
+Why have you chosen those components?
+
+A1|c
+I've chosen these components because the database itself is structured and stored '
+in the form of a relational database that describes relationships between each
+category of product and its corresponding URL. Sqoop has the ability to move the
+data between Hadoop and its relational database systems, which is something Flume
+is not very good at.
+
+Second, Hive was chosen as the component with which the system can use to interact
+with the URL DB given that HIVEQL has an SQL-like interface, and is suited for data
+warehouse applications, especially in the case of structured data, which we have.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Second, the log file has to be ingested into Hadoop.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Q2|a
+Which component of Hadoop should your system use to ingest the log file into
+Hadoop?
+
+A2|a
+The component of Hadoop that our system should use to ingest the log file into
+Hadoop is Flume, as the ideal data ingestion tool.
+
+Q2|b
+Why that component? What might be some alternatives?
+
+A2|b
+Flume is chosen as the component here due to the ability it has to retrieve data
+in the form of log files from various servers, into centralized stores. For large
+amounts of data, Flume is very reliable as a tool and is known to be fairly fault
+tolerant as well. 
+
+However, there are alternative choices for this particular function, which do
+include: Apache Spark, Apache Storm, Kafka, and Logstash, among others.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Third, the crawler has to retrieve the content of web pages. For simplicity, let 
+us assume that there is only one instance of the crawler operating and it 
+downloads and operates only one page at a time. We can also assume that web pages
+to be downloaded belong only to certain media and blog sites (so, not entire web).
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Q3|a Which Hadoop component should be used to ingest this content?
+
+A3|a
+The Hadoop component that should be used in order to ingest this content would be 
+probably ideally Apache Spark.
+
+Q3|b Why that component?
+
+A3|b
+Apache Spark in particular is a good choice of component to be used to ingest
+this content due to the variety of advantages it provides, such as ease of use, 
+as well as speed, since it can quickly write Java and Python applications.
+Additionally,  the crawler could be easily built on Apache Spark, and while the 
+crawler will download and operate on a single-page at a time, Apache Spark can
+support real-time use cases as well.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Fourth, for each page we have to find all the links in each page which point to
+a URL in our URL DB. Let us say we are provided a program to do that called
+LinkFinderAnalyzer.
+
+Fortunately, LinkFinderAnalyzer does a number of additional tasks. It extracts
+the para in which the link appears, and then it invokes Sentimenter to find the
+sentiment of the paragraph. Then, for each link_anchor, it computes the hit score
+of that link_anchor. 
+
+The output of running LinkAnalyzerFinder are tuples of the form <Product_type,
+<Sentiment:hit_score>>. We want to reduce these tupes to tuples of the form
+<Product_type, <Sentiment:hit_score, Sentiment:hit_score,...,Sentiment:hit_score>>.
+
+We can use MapReduce to do these tasks, where the mapping function is LinkFinderAnalyzer.
+This is similar to the MapReduce assignment.
+
+Keep in mind that for each product_type, there can be many such tuples because there
+could be several products in a product type and there could be several URLs pointing
+to a product in that product type. 
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Fifth, for each product category we want to combine the tuples produced by step
+4. So suppose we had two tuples: <Cosmetics, <Upbeat: 0.3,...,Downbeat: 0.01>>
+and <Cosmetics, Neutral: 0.011,...,Upbeat: 0.04>>, we want to combine them into
+one tuple: <Cosmetics, <Upbeat: 0.3,..., Downbeat: 0.01, Neutral: 0.011,...,
+Upbeat: 0.04>>.
+
+This may also be MapReduce job. The mapper does nothing but then there is
+shuffling and sorting in terms of product category, and redcing which combines
+the lists for each product category.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Sixth, for each tuple of step 5 we want to compute the average hit score for each
+sentiment type. The output of this step should be <Product_Category, <Upbeat:
+Average_hit_score, Neutral: Average_hit_score, Downbeat: Average_hit_score>>.
+
+This is the final output of the system.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Q4|a
+Which components of the Hadoop ecosystem will you use to do each of the jobs of 
+steps 4-6? Would you use MapReduce or some interface to MapReduce (Hive? Pig?
+Spark?)
+
+A4|a
+Given that the above outlined steps include various resource manager components,
+data ingestion components, and analysis components in the Hadoop ecosystem, and
+the fact that Apache Pig and Hive are both functional interfaces to MapReduce, I
+would choose between these two components for this particular task. Apache Spark,
+I believe, may be the preferred component, given that it is often a faster process
+for handling iterative operations since it can store these in memory as data,
+instead of writing to disk--which then speeds up execution time substantially.
+
+Q4|b
+Would you use the same component for each of steps 4-6, or would you use
+different components? You must justify your answer.
+
+A4|b
+I would make some changes to the setup that I outlined in the prior question--since in
+the listed Step 4, the data ingestion tools will ingest the data into Hadoop and in the
+following Steps 5 and 6, the data processing tools will process the data in HDFS. In
+such a case, a resource manager, for instance, YARN, would be responsible for the
+resource management components of the entire process instead.
+
+Q4|c
+Keep in mind that we are chaining together the operations of Steps 4-6. How 
+should the output of the previous step in the sequence be passed to the next
+step? What kind of Hadoop architecture is best suited for that? Will your
+system store the intermediate results? If so, in what sort of structure?
+
+A4|c
+This application would need several instances of MapReduce jobs running at the 
+same time, sequenced together, wherein the various I/O costs can end up being
+somewhat of a limiting factor. There is a great benefit to be had by making use of
+Apache Spark RDD since the data, as said earlier, is stored in memory as opposed to
+being written to disk, which greatly speeds up the execution time.
+--------------------------------------------------------------------------------
